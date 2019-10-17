@@ -6,6 +6,8 @@ from flask_jwt import JWT, jwt_required, current_identity
 from models import db, Branch, Bank
 from auth import authenticate, identity
 
+import datetime
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -15,6 +17,7 @@ app.config[
 ] = "postgresql://postgres:postgres@localhost/"
 app.config["SECRET_KEY"] = "super-secret"
 app.config["JWT_AUTH_URL_RULE"] = "/a"
+app.config["JWT_EXPIRATION_DELTA"] = datetime.timedelta(days=5)
 
 db.init_app(app)
 
