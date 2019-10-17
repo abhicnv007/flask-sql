@@ -1,8 +1,10 @@
 from flask import Flask, jsonify
 from webargs import fields
 from webargs.flaskparser import use_args
+from flask_jwt import JWT, jwt_required, current_identity
 
 from models import db, Branch, Bank
+from auth import authenticate, identity
 
 app = Flask(__name__)
 
@@ -11,12 +13,18 @@ app.config["DEBUG"] = True
 app.config[
     "SQLALCHEMY_DATABASE_URI"
 ] = "postgresql://postgres:postgres@localhost/"
-
+app.config["SECRET_KEY"] = "super-secret"
+app.config["JWT_AUTH_URL_RULE"] = "/a"
 
 db.init_app(app)
 
 
+# dummy authentication that always returns true, and identity of user as default user
+jwt = JWT(app, authenticate, identity)
+
+
 @app.route("/bank_details")
+@jwt_required()
 @use_args({"ifsc_code": fields.Str(required=True)})
 def get_bank_details(args):
     branch, bank = (
@@ -31,6 +39,7 @@ def get_bank_details(args):
 
 
 @app.route("/branch_details")
+@jwt_required()
 @use_args(
     {
         "bank_name": fields.Str(required=True),
