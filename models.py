@@ -2,8 +2,6 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
-# print(db)
-
 
 class Bank(db.Model):
     __tablename__ = "banks"

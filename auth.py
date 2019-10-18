@@ -14,6 +14,7 @@ username_table = {u.username: u for u in users}
 userid_table = {u.id: u for u in users}
 
 
+# default functions from flask-JWT
 def authenticate(username, password):
     user = username_table.get(username, None)
     if user and safe_str_cmp(
