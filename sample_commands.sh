@@ -36,4 +36,4 @@ CITY="Mumbai"
 
 printf "\nTrying branch details for ${BANK} in ${CITY}\n"
 curl -H "Authorization: jwt ${TOKEN}" -G \
-    ${HOST}/branch_details?limit=10 --data-urlencode "bank_name=${BANK}" --data-urlencode "city=${CITY}" 
+    ${HOST}/branch_details?limit=10\&offset=10 --data-urlencode "bank_name=${BANK}" --data-urlencode "city=${CITY}" 
