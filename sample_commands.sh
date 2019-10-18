@@ -7,20 +7,33 @@ then
   sudo apt-get install -y jq
 fi
 
-
 # HOST="http://localhost:5000"
 HOST="https://flask-bank.herokuapp.com"
 
-echo "Trying the authenticate api for access token"
-TOKEN=$(curl ${HOST}/authenticate -XPOST \
- -H "Content-type: application/json" \
- -d '{"username":"default", "password":"iaMAStronGP@$$w0rd"}' | jq -r '.access_token')
+TOKEN="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzE4MjM2NzcsImlhdCI6MTU3MTM5MTY3NywibmJmIjoxNTcxMzkxNjc3LCJpZGVudGl0eSI6MX0.PnOHeWPvHBCPiNQzYtkfA9v2lGdXPPRpxAUMHIyyXQ0"
 
-echo "access token" $TOKEN
+echo "Do you wish to refresh the JWT or use an existing one? (Yes/No)"
+select yn in "Yes" "No"; do
+    case $yn in
+        Yes ) printf "\nUsing the authenticate api for access token\n";
+              TOKEN=$(curl -s ${HOST}/authenticate -XPOST \
+                      -H "Content-type: application/json" \
+                      -d '{"username":"default", "password":"iaMAStronGP@$$w0rd"}' | jq -r '.access_token');
+              printf "Got token ${TOKEN}";break;;
+        No ) break;;
+    esac
+done
 
-echo 'Trying bank details for IFSC HDFC0000001'
-curl -H "Authorization: jwt ${TOKEN}" ${HOST}/bank_details?ifsc_code=HDFC0000001
 
-echo 'Trying branch details for State bank of india in Mumbai' 
-curl -H "Authorization: jwt ${TOKEN}" \
-    ${HOST}/branch_details?bank_name=State%20Bank%20of%20India\&city=MUMBAI\&limit=10\&offset=100
+printf "\nUsing access token ${TOKEN}\n"
+
+IFSC="HDFC0000001"
+printf "\nTrying bank details for IFSC ${IFSC}\n"
+curl -H "Authorization: jwt ${TOKEN}" ${HOST}/bank_details?ifsc_code=${IFSC}
+
+BANK="HDFC Bank"
+CITY="Mumbai"
+
+printf "\nTrying branch details for ${BANK} in ${CITY}\n"
+curl -H "Authorization: jwt ${TOKEN}" -G \
+    ${HOST}/branch_details?limit=10 --data-urlencode "bank_name=${BANK}" --data-urlencode "city=${CITY}" 
