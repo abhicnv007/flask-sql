@@ -22,6 +22,11 @@ db.init_app(app)
 jwt = JWT(app, authenticate, identity)
 
 
+@app.route("/")
+def index():
+    return 'Hello, visit <a href="https://github.com/abhicnv007/flask-sql" target="_blank">here</a> to learn more'
+
+
 @app.route("/bank_details")
 @jwt_required()
 @use_args({"ifsc_code": fields.Str(required=True)})
