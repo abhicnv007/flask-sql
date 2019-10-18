@@ -1,3 +1,4 @@
+import os
 import datetime
 
 
@@ -8,7 +9,7 @@ class Config(object):
 
 
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = "postgresql://postgres:postgres@localhost/"
+    SQLALCHEMY_DATABASE_URI = os.environ["DATABASE_URL"]
     SECRET_KEY = "secret"
 
 

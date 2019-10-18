@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, jsonify
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -9,7 +11,12 @@ from auth import authenticate, identity
 import config
 
 app = Flask(__name__)
-app.config.from_object(config.DevelopmentConfig)
+
+if os.environ.get("PRODUCTION"):
+    app.config.from_object(config.ProductionConfig)
+else:
+    app.config.from_object(config.DevelopmentConfig)
+
 db.init_app(app)
 
 jwt = JWT(app, authenticate, identity)
