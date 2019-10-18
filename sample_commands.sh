@@ -8,18 +8,19 @@ then
 fi
 
 
-HOST="localhost:5000"
+# HOST="http://localhost:5000"
+HOST="https://flask-bank.herokuapp.com"
 
 echo "Trying the authenticate api for access token"
-TOKEN=$(curl http://${HOST}/authenticate -XPOST \
+TOKEN=$(curl ${HOST}/authenticate -XPOST \
  -H "Content-type: application/json" \
  -d '{"username":"default", "password":"iaMAStronGP@$$w0rd"}' | jq -r '.access_token')
 
 echo "access token" $TOKEN
 
 echo 'Trying bank details for IFSC HDFC0000001'
-curl -H "Authorization: jwt ${TOKEN}" http://${HOST}/bank_details?ifsc_code=HDFC0000001
+curl -H "Authorization: jwt ${TOKEN}" ${HOST}/bank_details?ifsc_code=HDFC0000001
 
 echo 'Trying branch details for State bank of india in Mumbai' 
 curl -H "Authorization: jwt ${TOKEN}" \
-    http://${HOST}/branch_details?bank_name=State%20Bank%20of%20India\&city=MUMBAI\&limit=10\&offset=100
+    ${HOST}/branch_details?bank_name=State%20Bank%20of%20India\&city=MUMBAI\&limit=10\&offset=100
