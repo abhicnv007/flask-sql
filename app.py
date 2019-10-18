@@ -1,28 +1,17 @@
 from flask import Flask, jsonify
 from webargs import fields
 from webargs.flaskparser import use_args
-from flask_jwt import JWT, jwt_required, current_identity
+from flask_jwt import JWT, jwt_required
 
 from models import db, Branch, Bank
 from auth import authenticate, identity
 
-import datetime
+import config
 
 app = Flask(__name__)
-
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-app.config["DEBUG"] = True
-app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = "postgresql://postgres:postgres@localhost/"
-app.config["SECRET_KEY"] = "super-secret"
-app.config["JWT_AUTH_URL_RULE"] = "/a"
-app.config["JWT_EXPIRATION_DELTA"] = datetime.timedelta(days=5)
-
+app.config.from_object(config.DevelopmentConfig)
 db.init_app(app)
 
-
-# dummy authentication that always returns true, and identity of user as default user
 jwt = JWT(app, authenticate, identity)
 
 
