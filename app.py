@@ -27,7 +27,7 @@ def index():
     return 'Hello, visit <a href="https://github.com/abhicnv007/flask-sql" target="_blank">here</a> to learn more'
 
 
-@app.route("/bank_details")
+@app.route("/bank_details", methods=["GET"])
 @jwt_required()
 @use_args({"ifsc_code": fields.Str(required=True)})
 def get_bank_details(args):
@@ -42,7 +42,7 @@ def get_bank_details(args):
     return jsonify(bank.serialize())
 
 
-@app.route("/branch_details")
+@app.route("/branch_details", methods=["GET"])
 @jwt_required()
 @use_args(
     {
