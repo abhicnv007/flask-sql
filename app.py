@@ -31,15 +31,30 @@ def index():
 @jwt_required()
 @use_args({"ifsc_code": fields.Str(required=True)})
 def get_bank_details(args):
-    branch, bank = (
+
+    # define all the fields we want from the query
+    fields = {
+        "address": Branch.address,
+        "city": Branch.city,
+        "district": Branch.district,
+        "state": Branch.state,
+        "ifsc": Branch.ifsc,
+        "bank_name": Bank.name,
+        "branch": Branch.branch,
+    }
+
+    branch = (
         db.session()
         .query(Branch, Bank)
+        .with_entities(*list(fields.values()))
         .filter(Branch.ifsc == args["ifsc_code"].upper())
         .filter(Branch.bank_id == Bank.id)
         .first()
     )
 
-    return jsonify(bank.serialize())
+    print(branch)
+
+    return jsonify(dict(zip(list(fields.keys()), branch)))
 
 
 @app.route("/branch_details", methods=["GET"])
@@ -54,9 +69,24 @@ def get_bank_details(args):
 )
 def get_branch_details(args):
     branches = []
-    for _, branch in (
+
+    fields = {
+        "address": Branch.address,
+        "city": Branch.city,
+        "district": Branch.district,
+        "state": Branch.state,
+        "ifsc": Branch.ifsc,
+        "bank_name": Bank.name,
+        "branch": Branch.branch,
+    }
+
+    # dict.values returns a consistent list since it
+    # preserves the insertion order
+
+    for branch in (
         db.session()
         .query(Bank, Branch)
+        .with_entities(*list(fields.values()))
         .filter(Bank.name == args["bank_name"].upper())
         .filter(Branch.city == args["city"].upper())
         .filter(Branch.bank_id == Bank.id)
@@ -64,7 +94,7 @@ def get_branch_details(args):
         .offset(args["offset"])
         .all()
     ):
-        branches.append(branch.serialize())
+        branches.append(dict(zip(list(fields.keys()), branch)))
 
     return jsonify(branches)
 
